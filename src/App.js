@@ -6,14 +6,17 @@ import ViewExpensesModal from "./components/ViewExpensesModal";
 import BudgetCard from "./components/BudgetCard";
 import UncategorizedBudgetCard from "./components/UncategorizedBudgetCard";
 import TotalBudgetCard from "./components/TotalBudgetCard";
-import StudentLoanModal from "./components/StudentLoanModal"; // Import the new modal
+import StudentLoanModal from "./components/StudentLoanModal"; 
 import { useState, useEffect } from "react";
 import { UNCATEGORIZED_BUDGET_ID, useBudgets } from "./contexts/BudgetsContext";
 
 // Import your images
 import emptyImage from './assets/empty.png';
-import halfFullImage from './assets/half-full.jpeg';
-import fullImage from './assets/full.jpg';
+import imageTwenty from './assets/20.png';
+import imageFourty from './assets/40.png';
+import imageSixty from './assets/60.png';
+import imageEighty from './assets/80.png';
+import fullImage from './assets/full.png';
 
 function App() {
   const [showAddBudgetModal, setShowAddBudgetModal] = useState(false);
@@ -25,6 +28,7 @@ function App() {
   
   // State for current budget fullness image
   const [budgetImage, setBudgetImage] = useState(emptyImage);
+  const [fullnessRatio, setFullnessRatio] = useState(0); 
 
   function openAddExpenseModal(budgetId) {
     setShowAddExpenseModal(true);
@@ -33,7 +37,7 @@ function App() {
 
   const handleAddStudentLoanExpense = (expense) => {
     console.log('Added Student Loan Expense:', expense);
-    setShowStudentLoanModal(false); // Close the modal after adding
+    setShowStudentLoanModal(false); 
   };
 
   useEffect(() => {
@@ -42,24 +46,30 @@ function App() {
         total + getBudgetExpenses(budget.id).reduce((sum, expense) => sum + expense.amount, 0), 
     0);
 
-    // Check if totalBudget is 0
     if (totalBudget === 0) {
-        setBudgetImage(fullImage); // Set to empty if no budget
-        return; // Exit early to avoid further calculations
+        setBudgetImage(emptyImage); 
+        setFullnessRatio(0); 
+        return;
     }
 
-    const fullnessRatio = totalExpenses / totalBudget;
+    const calculatedFullnessRatio = totalExpenses / totalBudget;
+    setFullnessRatio(calculatedFullnessRatio);
 
     // Change image based on fullness ratio
-    if (fullnessRatio <= 0.25) {
-        setBudgetImage(fullImage);
-    } else if (fullnessRatio <= 0.75) {
-        setBudgetImage(halfFullImage);
-    } else {
+    if (calculatedFullnessRatio <= 0.2) {
         setBudgetImage(emptyImage);
+    } else if (calculatedFullnessRatio <= 0.4) {
+        setBudgetImage(imageTwenty);
+    } else if (calculatedFullnessRatio <= 0.6) {
+      setBudgetImage(imageFourty);
+    } else if (calculatedFullnessRatio <= 0.8) {
+    setBudgetImage(imageSixty);
+    } else if (calculatedFullnessRatio <= 0.99) {
+  setBudgetImage(imageEighty);
+    }  else {
+        setBudgetImage(fullImage);
     }
 }, [budgets, getBudgetExpenses]);
-
 
   return (
     <>
@@ -112,11 +122,30 @@ function App() {
         </div>
 
         {/* Display the current budget image */}
-        <img
-          src={budgetImage}
-          alt="Budget Status"
-          style={{ width: "100%", height: "auto", position: "fixed", bottom: 0, left: 0, zIndex: -1 }}
-        />
+        <div 
+          style={{
+            position: "fixed", 
+            bottom: 0, 
+            left: 0, 
+            width: "100%", 
+            height: "150px",  // Adjusted height to a fixed value to avoid shrinking
+            zIndex: 1, 
+            display: "flex", 
+            justifyContent: "center", 
+            alignItems: "center",
+            backgroundColor: "white" // Optional background to make sure the image is clearly visible
+          }}
+        >
+          <img
+            src={budgetImage}
+            alt="Budget Status"
+            style={{ 
+              maxHeight: "100%",  // Keeps the image within the height limit
+              maxWidth: "100%",    // Keeps the image within the width limit
+              objectFit: "contain" // Ensures the image retains its aspect ratio
+            }}
+          />
+        </div>
       </Container>
       <AddBudgetModal
         show={showAddBudgetModal}
