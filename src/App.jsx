@@ -138,7 +138,7 @@ function App() {
       <Routes>
         <Route path="/home" element={<Home />} />
         <Route path="/app" element={
-          <div className="container mx-auto p-4 flex flex-col min-h-screen">
+          <div className="container mx-auto p-4 flex flex-col min-h-screen relative">
             <h1 className="text-2xl font-bold mb-4">Budgets</h1>
             <p className="text-lg font-semibold">Points: {userPoints}</p>
             <div className="flex flex-wrap items-center mb-4 gap-2">
@@ -202,18 +202,23 @@ function App() {
                         Complete Challenge
                       </button>
                     ) : (
-                      <p className="text-green-600">Challenge Completed!</p>
+                      <span className="text-green-600 font-bold">Completed</span>
                     )}
                   </div>
                 ))}
               </div>
             </div>
 
-            <div className="fixed bottom-0 left-0 w-full h-36 z-10 flex justify-center items-center bg-white">
+            {/* Image in the Top Right Corner */}
+            <div className="absolute top-4 right-10">
               <img
                 src={budgetImage}
                 alt="Budget Status"
-                className="max-h-full max-w-full object-contain"
+                style={{
+                  width: '150px',  // Increased width
+                  height: '150px', // Increased height
+                  objectFit: 'contain',
+                }}
               />
             </div>
           </div>
