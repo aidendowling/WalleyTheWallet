@@ -15,16 +15,22 @@ import Home from './components/Home';
 import emptyImage from './assets/empty.png';
 import imageTwenty from './assets/20.png';
 import imageFourty from './assets/40.png';
-import imageSixty from './assets/60.png';
 import imageEighty from './assets/80.png';
 import fullImage from './assets/full.png';
+import imageForCompletedChallengeLow from './assets/completed_low.png';
+import imageForCompletedChallengeModerate from './assets/completed_moderate.png'; 
 
-// Store Modal Component
-function StoreModal({ showModal, handleClose, userPoints, setUserPoints, storeItems, userItems, setUserItems }) {
+function StoreModal({ showModal, handleClose, userPoints, setUserPoints, storeItems, purchasedItems, setPurchasedItems }) {
   const handlePurchase = (item) => {
+    if (purchasedItems[item.id]) {
+      alert(`You have already purchased a ${item.name}!`);
+      return;
+    }
+
     if (userPoints >= item.price) {
       setUserPoints(userPoints - item.price);
-      setUserItems([...userItems, item]);
+      setPurchasedItems(prev => ({ ...prev, [item.id]: true }));
+      alert(`You bought a ${item.name}!`);
     } else {
       alert('Not enough points!');
     }
@@ -43,8 +49,9 @@ function StoreModal({ showModal, handleClose, userPoints, setUserPoints, storeIt
               <button 
                 className="btn btn-primary"
                 onClick={() => handlePurchase(item)}
+                disabled={purchasedItems[item.id]}
               >
-                Buy
+                {purchasedItems[item.id] ? 'Purchased' : 'Buy'}
               </button>
             </li>
           ))}
@@ -63,17 +70,19 @@ function App() {
   const [viewExpensesModalBudgetId, setViewExpensesModalBudgetId] = useState();
   const [addExpenseModalBudgetId, setAddExpenseModalBudgetId] = useState();
   const { budgets, getBudgetExpenses } = useBudgets();
-  
+
   const [budgetImage, setBudgetImage] = useState(emptyImage);
   const [fullnessRatio, setFullnessRatio] = useState(0); 
 
   // Points system and store feature states
   const [showStoreModal, setShowStoreModal] = useState(false);
-  const [storeItems, setStoreItems] = useState([
+  const [purchasedItems, setPurchasedItems] = useState({});
+  const [storeItems] = useState([
     { id: 1, name: 'Hat', price: 50 },
     { id: 2, name: 'Sunglasses', price: 75 },
     { id: 3, name: 'Backpack', price: 100 },
   ]);
+
   const [userItems, setUserItems] = useState([]);
   const [userPoints, setUserPoints] = useState(0); // Starting points at 0
 
@@ -107,31 +116,42 @@ function App() {
   useEffect(() => {
     const totalBudget = budgets.reduce((total, budget) => total + budget.max, 0);
     const totalExpenses = budgets.reduce((total, budget) => 
-        total + getBudgetExpenses(budget.id).reduce((sum, expense) => sum + expense.amount, 0), 
+      total + getBudgetExpenses(budget.id).reduce((sum, expense) => sum + expense.amount, 0), 
     0);
-    // Reward points if the user is under budget
+    
     if (totalBudget > 0 && totalExpenses <= totalBudget) {
       const savings = totalBudget - totalExpenses;
-      const pointsEarned = Math.floor(savings / 10); // Earn points based on savings
+      const pointsEarned = Math.floor(savings / 10);
       setUserPoints(prevPoints => prevPoints + pointsEarned);
     }
 
     if (totalBudget === 0) {
-        setBudgetImage(emptyImage); 
-        setFullnessRatio(0); 
-        return;
+      setBudgetImage(emptyImage);
+      setFullnessRatio(0);
+      return;
     }
 
     const calculatedFullnessRatio = totalExpenses / totalBudget;
     setFullnessRatio(calculatedFullnessRatio);
 
-    if (calculatedFullnessRatio <= 0.2) setBudgetImage(emptyImage);
-    else if (calculatedFullnessRatio <= 0.4) setBudgetImage(imageTwenty);
-    else if (calculatedFullnessRatio <= 0.6) setBudgetImage(imageFourty);
-    else if (calculatedFullnessRatio <= 0.8) setBudgetImage(imageSixty);
-    else if (calculatedFullnessRatio <= 0.99) setBudgetImage(imageEighty);
-    else setBudgetImage(fullImage);
-  }, [budgets, getBudgetExpenses]);
+    // Determine which image to use based on fullness ratio and purchased items
+    let selectedImage;
+    if (purchasedItems[2]) { // Check if sunglasses are purchased
+      selectedImage = imageForCompletedChallengeLow;
+    } else if (calculatedFullnessRatio <= 0.2) {
+      selectedImage = emptyImage;
+    } else if (calculatedFullnessRatio <= 0.5) {
+      selectedImage = imageFourty;
+    } else if (calculatedFullnessRatio <= 0.8) {
+      selectedImage = imageTwenty;
+    } else if (calculatedFullnessRatio <= 0.99) {
+      selectedImage = imageEighty;
+    } else {
+      selectedImage = fullImage;
+    }
+
+    setBudgetImage(selectedImage);
+  }, [budgets, getBudgetExpenses, purchasedItems]);
 
   return (
     <Router>
@@ -215,8 +235,8 @@ function App() {
                 src={budgetImage}
                 alt="Budget Status"
                 style={{
-                  width: '150px',  // Increased width
-                  height: '150px', // Increased height
+                  width: '200px',  // Increased width
+                  height: '200px', // Increased height
                   objectFit: 'contain',
                 }}
               />
@@ -251,8 +271,8 @@ function App() {
         userPoints={userPoints}
         setUserPoints={setUserPoints}
         storeItems={storeItems}
-        userItems={userItems}
-        setUserItems={setUserItems}
+        purchasedItems={purchasedItems}
+        setPurchasedItems={setPurchasedItems}
       />
     </Router>
   );

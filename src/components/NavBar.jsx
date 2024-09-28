@@ -9,7 +9,7 @@ export default function NavBar() {
       <div className="container mx-auto flex justify-between items-center">
         <div className="flex items-center space-x-2">
           <Wallet size={24} />
-          <Link to="/home" className="text-xl font-bold">Walley the Wallet</Link>
+          <Link to="/home" className="text-xl font-bold">Walley</Link>
         </div>
         <div className="space-x-2 flex items-center">
           <Button variant="ghost" className="text-gray-600 hover:text-gray-800">Expenses</Button>
