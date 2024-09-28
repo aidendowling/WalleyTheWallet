@@ -136,8 +136,8 @@ function App() {
     setFullnessRatio(calculatedFullnessRatio);
 
     if (calculatedFullnessRatio <= 0.2) setBudgetImage(emptyImage);
-    else if (calculatedFullnessRatio <= 0.5) setBudgetImage(imageTwenty);
-    else if (calculatedFullnessRatio <= 0.8) setBudgetImage(imageFourty);
+    else if (calculatedFullnessRatio <= 0.5) setBudgetImage(imageFourty);
+    else if (calculatedFullnessRatio <= 0.8) setBudgetImage(imageTwenty);
     else if (calculatedFullnessRatio <= 0.99) setBudgetImage(imageEighty);
     else setBudgetImage(fullImage);
   }, [budgets, getBudgetExpenses]);
