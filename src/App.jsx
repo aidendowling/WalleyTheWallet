@@ -17,6 +17,42 @@ import imageSixty from './assets/60.png';
 import imageEighty from './assets/80.png';
 import fullImage from './assets/full.png';
 
+// Store Modal Component
+function StoreModal({ showModal, handleClose, userPoints, setUserPoints, storeItems, userItems, setUserItems }) {
+  const handlePurchase = (item) => {
+    if (userPoints >= item.price) {
+      setUserPoints(userPoints - item.price);
+      setUserItems([...userItems, item]);
+    } else {
+      alert('Not enough points!');
+    }
+  };
+
+  return (
+    <div className={`modal ${showModal ? 'modal-open' : ''}`}>
+      <div className="modal-box">
+        <h2 className="text-lg font-bold">Store</h2>
+        <p>Your Points: {userPoints}</p>
+        <ul>
+          {storeItems.map(item => (
+            <li key={item.id} className="flex justify-between my-2">
+              <span>{item.name}</span>
+              <span>{item.price} Points</span>
+              <button 
+                className="btn btn-primary"
+                onClick={() => handlePurchase(item)}
+              >
+                Buy
+              </button>
+            </li>
+          ))}
+        </ul>
+        <button className="btn btn-outline" onClick={handleClose}>Close</button>
+      </div>
+    </div>
+  );
+}
+
 function App() {
   const [showAddBudgetModal, setShowAddBudgetModal] = useState(false);
   const [showAddExpenseModal, setShowAddExpenseModal] = useState(false);
@@ -29,6 +65,23 @@ function App() {
   const [budgetImage, setBudgetImage] = useState(emptyImage);
   const [fullnessRatio, setFullnessRatio] = useState(0); 
 
+  // Points system and store feature states
+  const [showStoreModal, setShowStoreModal] = useState(false);
+  const [storeItems, setStoreItems] = useState([
+    { id: 1, name: 'Hat', price: 50 },
+    { id: 2, name: 'Sunglasses', price: 75 },
+    { id: 3, name: 'Backpack', price: 100 },
+  ]);
+  const [userItems, setUserItems] = useState([]);
+  const [userPoints, setUserPoints] = useState(0); // Starting points at 0
+
+  // Challenges state
+  const [challenges, setChallenges] = useState([
+    { id: 1, description: "Save $50 this week", isCompleted: false },
+    { id: 2, description: "Cut out one unnecessary expense", isCompleted: false },
+    { id: 3, description: "Spend less than $100 this week", isCompleted: false },
+  ]);
+
   function openAddExpenseModal(budgetId) {
     setShowAddExpenseModal(true);
     setAddExpenseModalBudgetId(budgetId);
@@ -40,11 +93,27 @@ function App() {
   };
   
 
+  // Function to complete a challenge
+  const completeChallenge = (challengeId) => {
+    setChallenges(prevChallenges => 
+      prevChallenges.map(challenge => 
+        challenge.id === challengeId ? { ...challenge, isCompleted: true } : challenge
+      )
+    );
+    setUserPoints(prevPoints => prevPoints + 20); // Reward for completing a challenge
+  };
+
   useEffect(() => {
     const totalBudget = budgets.reduce((total, budget) => total + budget.max, 0);
     const totalExpenses = budgets.reduce((total, budget) => 
         total + getBudgetExpenses(budget.id).reduce((sum, expense) => sum + expense.amount, 0), 
     0);
+     // Reward points if the user is under budget
+    if (totalBudget > 0 && totalExpenses <= totalBudget) {
+     const savings = totalBudget - totalExpenses;
+      const pointsEarned = Math.floor(savings / 10); // Earn points based on savings
+      setUserPoints(prevPoints => prevPoints + pointsEarned);
+    }
 
     if (totalBudget === 0) {
         setBudgetImage(emptyImage); 
@@ -66,6 +135,7 @@ function App() {
   return (
     <div className="container mx-auto p-4 flex flex-col min-h-screen">
       <h1 className="text-2xl font-bold mb-4">Budgets</h1>
+      <p className="text-lg font-semibold">Points: {userPoints}</p>
       <div className="flex flex-wrap items-center mb-4 gap-2">
         <button className="btn btn-primary" onClick={() => setShowAddBudgetModal(true)}>
           Add Budget
@@ -76,8 +146,11 @@ function App() {
         <button className="btn btn-outline btn-secondary" onClick={() => setShowStudentLoanModal(true)}>
           Add Student Loan Expense
         </button>
+        <button className="btn btn-outline btn-success" onClick={() => setShowStoreModal(true)}>
+          Visit Store
+        </button>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-36">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-4">
         {budgets.map(budget => {
           const amount = getBudgetExpenses(budget.id).reduce(
             (total, expense) => total + expense.amount,
@@ -109,6 +182,28 @@ function App() {
         </div>
       </div>
 
+      {/* Financial Challenges Section */}
+      <div className="flex flex-col mb-4">
+        <h2 className="text-xl font-bold">Financial Challenges</h2>
+        <div className="grid grid-cols-1 gap-4">
+          {challenges.map(challenge => (
+            <div key={challenge.id} className="border p-4 rounded-lg">
+              <p>{challenge.description}</p>
+              {!challenge.isCompleted ? (
+                <button 
+                  className="btn btn-success"
+                  onClick={() => completeChallenge(challenge.id)}
+                >
+                  Complete Challenge
+                </button>
+              ) : (
+                <p className="text-green-600">Challenge Completed!</p>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+
       <div className="fixed bottom-0 left-0 w-full h-36 z-10 flex justify-center items-center bg-white">
         <img
           src={budgetImage}
@@ -134,6 +229,15 @@ function App() {
         showModal={showStudentLoanModal} 
         handleClose={() => setShowStudentLoanModal(false)}
         onAddStudentLoan={handleAddStudentLoanExpense}
+      />
+      <StoreModal 
+        showModal={showStoreModal} 
+        handleClose={() => setShowStoreModal(false)}
+        userPoints={userPoints}
+        setUserPoints={setUserPoints}
+        storeItems={storeItems}
+        userItems={userItems}
+        setUserItems={setUserItems}
       />
     </div>
   );
