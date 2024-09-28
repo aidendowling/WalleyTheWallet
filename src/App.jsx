@@ -17,6 +17,8 @@ import imageTwenty from './assets/20.png';
 import imageFourty from './assets/40.png';
 import imageEighty from './assets/80.png';
 import fullImage from './assets/full.png';
+import imageForCompletedChallengeLow from './assets/completed_low.png';
+import imageForCompletedChallengeModerate from './assets/completed_moderate.png'; 
 
 function StoreModal({ showModal, handleClose, userPoints, setUserPoints, storeItems, userItems, setUserItems }) {
   const [purchasedItems, setPurchasedItems] = useState({}); // State to track purchased items
@@ -51,7 +53,7 @@ function StoreModal({ showModal, handleClose, userPoints, setUserPoints, storeIt
               <button 
                 className="btn btn-primary"
                 onClick={() => handlePurchase(item)}
-                disabled={!!purchasedItems[item.id]} // Disable if the item has been purchased
+                disabled={purchasedItems[item.id]} // Disable if the item has been purchased
               >
                 {purchasedItems[item.id] ? 'Purchased' : 'Buy'}
               </button>
@@ -63,7 +65,6 @@ function StoreModal({ showModal, handleClose, userPoints, setUserPoints, storeIt
     </div>
   );
 }
-
 
 function App() {
   const [showAddBudgetModal, setShowAddBudgetModal] = useState(false);
@@ -80,9 +81,9 @@ function App() {
   // Points system and store feature states
   const [showStoreModal, setShowStoreModal] = useState(false);
   const [storeItems, setStoreItems] = useState([
-    { id: 1, name: 'Hat', price: 50 },
-    { id: 2, name: 'Sunglasses', price: 75 },
-    { id: 3, name: 'Backpack', price: 100 },
+    { id: 1, name: 'Hat', price: 50, itemBought: false },
+    { id: 2, name: 'Sunglasses', price: 75, itemBought: false },
+    { id: 3, name: 'Backpack', price: 100, itemBought: false },
   ]);
   const [userItems, setUserItems] = useState([]);
   const [userPoints, setUserPoints] = useState(0); // Starting points at 0
@@ -117,8 +118,9 @@ function App() {
   useEffect(() => {
     const totalBudget = budgets.reduce((total, budget) => total + budget.max, 0);
     const totalExpenses = budgets.reduce((total, budget) => 
-        total + getBudgetExpenses(budget.id).reduce((sum, expense) => sum + expense.amount, 0), 
+      total + getBudgetExpenses(budget.id).reduce((sum, expense) => sum + expense.amount, 0), 
     0);
+    
     // Reward points if the user is under budget
     if (totalBudget > 0 && totalExpenses <= totalBudget) {
       const savings = totalBudget - totalExpenses;
@@ -127,19 +129,29 @@ function App() {
     }
 
     if (totalBudget === 0) {
-        setBudgetImage(emptyImage); 
-        setFullnessRatio(0); 
-        return;
+      setBudgetImage(emptyImage); 
+      setFullnessRatio(0); 
+      return;
     }
 
     const calculatedFullnessRatio = totalExpenses / totalBudget;
     setFullnessRatio(calculatedFullnessRatio);
 
-    if (calculatedFullnessRatio <= 0.2) setBudgetImage(emptyImage);
-    else if (calculatedFullnessRatio <= 0.5) setBudgetImage(imageFourty);
-    else if (calculatedFullnessRatio <= 0.8) setBudgetImage(imageTwenty);
-    else if (calculatedFullnessRatio <= 0.99) setBudgetImage(imageEighty);
-    else setBudgetImage(fullImage);
+    if(storeItems[1][3] === true) {
+      setBudgetImage(imageForCompletedChallengeLow);
+    }
+
+     else if (calculatedFullnessRatio <= 0.2) {
+      setBudgetImage(imageFourty);
+    } else if (calculatedFullnessRatio <= 0.5) {
+      setBudgetImage(imageFourty);
+    } else if (calculatedFullnessRatio <= 0.8) {
+      setBudgetImage(imageTwenty);
+    } else if (calculatedFullnessRatio <= 0.99) {
+      setBudgetImage(imageEighty);
+    } else {
+      setBudgetImage(fullImage);
+    }
   }, [budgets, getBudgetExpenses]);
 
   return (
