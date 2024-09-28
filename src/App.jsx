@@ -7,6 +7,7 @@ import BudgetCard from "./components/BudgetCard";
 import UncategorizedBudgetCard from "./components/UncategorizedBudgetCard";
 import TotalBudgetCard from "./components/TotalBudgetCard";
 import StudentLoanModal from "./components/StudentLoanModal"; 
+import StudentLoanCard from "./components/StudentLoanCard";
 
 // Import your images
 import emptyImage from './assets/empty.png';
@@ -20,6 +21,7 @@ function App() {
   const [showAddBudgetModal, setShowAddBudgetModal] = useState(false);
   const [showAddExpenseModal, setShowAddExpenseModal] = useState(false);
   const [showStudentLoanModal, setShowStudentLoanModal] = useState(false);
+  const [studentLoans, setStudentLoans] = useState([]);
   const [viewExpensesModalBudgetId, setViewExpensesModalBudgetId] = useState();
   const [addExpenseModalBudgetId, setAddExpenseModalBudgetId] = useState();
   const { budgets, getBudgetExpenses } = useBudgets();
@@ -32,10 +34,11 @@ function App() {
     setAddExpenseModalBudgetId(budgetId);
   }
 
-  const handleAddStudentLoanExpense = (expense) => {
-    console.log('Added Student Loan Expense:', expense);
-    setShowStudentLoanModal(false); 
+  const handleAddStudentLoanExpense = (loan) => {
+    setStudentLoans(prevLoans => [...prevLoans, loan]);
+    setShowStudentLoanModal(false);
   };
+  
 
   useEffect(() => {
     const totalBudget = budgets.reduce((total, budget) => total + budget.max, 0);
@@ -92,6 +95,9 @@ function App() {
             </div>
           );
         })}
+        {studentLoans.map((loan, index) => (
+          <StudentLoanCard key={index} loan={loan} />
+        ))}
         <div className="w-full">
           <UncategorizedBudgetCard
             onAddExpenseClick={openAddExpenseModal}
@@ -126,8 +132,8 @@ function App() {
       />
       <StudentLoanModal 
         showModal={showStudentLoanModal} 
-        defaultStudentLoan={addExpenseModalBudgetId}
         handleClose={() => setShowStudentLoanModal(false)}
+        onAddStudentLoan={handleAddStudentLoanExpense}
       />
     </div>
   );
