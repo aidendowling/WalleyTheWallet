@@ -142,7 +142,7 @@ function App() {
     }
 
      else if (calculatedFullnessRatio <= 0.2) {
-      setBudgetImage(imageFourty);
+      setBudgetImage(emptyImage);
     } else if (calculatedFullnessRatio <= 0.5) {
       setBudgetImage(imageFourty);
     } else if (calculatedFullnessRatio <= 0.8) {
