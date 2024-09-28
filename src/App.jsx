@@ -18,12 +18,21 @@ import imageFourty from './assets/40.png';
 import imageEighty from './assets/80.png';
 import fullImage from './assets/full.png';
 
-// Store Modal Component
 function StoreModal({ showModal, handleClose, userPoints, setUserPoints, storeItems, userItems, setUserItems }) {
+  const [purchasedItems, setPurchasedItems] = useState({}); // State to track purchased items
+
   const handlePurchase = (item) => {
+    // Check if the item has already been purchased
+    if (purchasedItems[item.id]) {
+      alert(`You have already purchased a ${item.name}!`);
+      return;
+    }
+
     if (userPoints >= item.price) {
       setUserPoints(userPoints - item.price);
       setUserItems([...userItems, item]);
+      setPurchasedItems((prev) => ({ ...prev, [item.id]: true })); // Mark item as purchased
+      alert(`You bought a ${item.name}!`);
     } else {
       alert('Not enough points!');
     }
@@ -42,8 +51,9 @@ function StoreModal({ showModal, handleClose, userPoints, setUserPoints, storeIt
               <button 
                 className="btn btn-primary"
                 onClick={() => handlePurchase(item)}
+                disabled={!!purchasedItems[item.id]} // Disable if the item has been purchased
               >
-                Buy
+                {purchasedItems[item.id] ? 'Purchased' : 'Buy'}
               </button>
             </li>
           ))}
@@ -53,6 +63,7 @@ function StoreModal({ showModal, handleClose, userPoints, setUserPoints, storeIt
     </div>
   );
 }
+
 
 function App() {
   const [showAddBudgetModal, setShowAddBudgetModal] = useState(false);
