@@ -15,7 +15,6 @@ import Home from './components/Home';
 import emptyImage from './assets/empty.png';
 import imageTwenty from './assets/20.png';
 import imageFourty from './assets/40.png';
-import imageSixty from './assets/60.png';
 import imageEighty from './assets/80.png';
 import fullImage from './assets/full.png';
 
@@ -126,9 +125,8 @@ function App() {
     setFullnessRatio(calculatedFullnessRatio);
 
     if (calculatedFullnessRatio <= 0.2) setBudgetImage(emptyImage);
-    else if (calculatedFullnessRatio <= 0.4) setBudgetImage(imageTwenty);
-    else if (calculatedFullnessRatio <= 0.6) setBudgetImage(imageFourty);
-    else if (calculatedFullnessRatio <= 0.8) setBudgetImage(imageSixty);
+    else if (calculatedFullnessRatio <= 0.5) setBudgetImage(imageTwenty);
+    else if (calculatedFullnessRatio <= 0.8) setBudgetImage(imageFourty);
     else if (calculatedFullnessRatio <= 0.99) setBudgetImage(imageEighty);
     else setBudgetImage(fullImage);
   }, [budgets, getBudgetExpenses]);
@@ -215,8 +213,8 @@ function App() {
                 src={budgetImage}
                 alt="Budget Status"
                 style={{
-                  width: '150px',  // Increased width
-                  height: '150px', // Increased height
+                  width: '200px',  // Increased width
+                  height: '200px', // Increased height
                   objectFit: 'contain',
                 }}
               />
