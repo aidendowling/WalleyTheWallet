@@ -7,7 +7,17 @@ export default function UncategorizedBudgetCard(props) {
     (total, expense) => total + expense.amount,
     0
   )
+
   if (amount === 0) return null
 
-  return <BudgetCard amount={amount} name="Uncategorized" gray {...props} />
+  return (
+    <div className="mt-4">
+      <BudgetCard
+        amount={amount}
+        name="Uncategorized"
+        className="bg-base-200 border-l-4 border-warning"
+        {...props}
+      />
+    </div>
+  )
 }
