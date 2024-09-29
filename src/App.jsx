@@ -20,13 +20,16 @@ import { Toaster } from "@/components/ui/toaster"
 
 
 // Import your images
-import emptyImage from './assets/empty.png';
-import imageTwenty from './assets/20.png';
+import emptyImage from './assets/empty.png'; 
+import imageTwenty from './assets/20.png'; 
 import imageFourty from './assets/40.png';
 import imageEighty from './assets/80.png';
 import fullImage from './assets/full.png';
-import imageForCompletedChallengeLow from './assets/completed_low.png';
-import imageForCompletedChallengeModerate from './assets/completed_moderate.png'; 
+import Sempty from './assets/Sempty.png';
+import S20 from './assets/S20.png';
+import S40 from './assets/S40.png';
+import S80 from './assets/S80.png';
+import Sfull from './assets/Sfull.png';
 
 
 function App() {
@@ -91,35 +94,47 @@ function App() {
       const pointsEarned = Math.floor(savings / 10);
       setUserPoints(prevPoints => prevPoints + pointsEarned);
     }
-
+  
     if (totalBudget === 0) {
       setBudgetImage(emptyImage);
       setFullnessRatio(0);
       return;
     }
-
+  
     const calculatedFullnessRatio = totalExpenses / totalBudget;
     setFullnessRatio(calculatedFullnessRatio);
-
+  
     // Determine which image to use based on fullness ratio and purchased items
     let selectedImage;
     if (purchasedItems[2]) { // Check if sunglasses are purchased
-      selectedImage = imageForCompletedChallengeLow;
-    } else if (calculatedFullnessRatio <= 0.2) {
-      selectedImage = emptyImage;
-    } else if (calculatedFullnessRatio <= 0.5) {
-      selectedImage = imageFourty;
-    } else if (calculatedFullnessRatio <= 0.8) {
-      selectedImage = imageTwenty;
-    } else if (calculatedFullnessRatio <= 0.99) {
-      selectedImage = imageEighty;
+      if (calculatedFullnessRatio <= 0.2) {
+        selectedImage = Sempty;
+      } else if (calculatedFullnessRatio <= 0.5) {
+        selectedImage = S20;
+      } else if (calculatedFullnessRatio <= 0.8) {
+        selectedImage = S40;
+      } else if (calculatedFullnessRatio <= 0.99) {
+        selectedImage = S80;
+      } else {
+        selectedImage = Sfull;
+      }
     } else {
-      selectedImage = fullImage;
+      if (calculatedFullnessRatio <= 0.2) {
+        selectedImage = emptyImage;
+      } else if (calculatedFullnessRatio <= 0.5) {
+        selectedImage = imageTwenty;
+      } else if (calculatedFullnessRatio <= 0.8) {
+        selectedImage = imageFourty;
+      } else if (calculatedFullnessRatio <= 0.99) {
+        selectedImage = imageEighty;
+      } else {
+        selectedImage = fullImage;
+      }
     }
-
+  
     setBudgetImage(selectedImage);
   }, [budgets, getBudgetExpenses, purchasedItems]);
-
+  
   return (
     <Router>
       <Routes>
