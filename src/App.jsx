@@ -9,7 +9,15 @@ import UncategorizedBudgetCard from "./components/UncategorizedBudgetCard";
 import TotalBudgetCard from "./components/TotalBudgetCard";
 import StudentLoanModal from "./components/StudentLoanModal"; 
 import StudentLoanCard from "./components/StudentLoanCard";
+import StoreModal from './components/StoreModal';
+
 import Home from './components/Home';
+
+
+import { Button } from "@/components/ui/button";
+import { Toaster } from "@/components/ui/toaster"
+
+
 
 // Import your images
 import emptyImage from './assets/empty.png';
@@ -20,47 +28,6 @@ import fullImage from './assets/full.png';
 import imageForCompletedChallengeLow from './assets/completed_low.png';
 import imageForCompletedChallengeModerate from './assets/completed_moderate.png'; 
 
-function StoreModal({ showModal, handleClose, userPoints, setUserPoints, storeItems, purchasedItems, setPurchasedItems }) {
-  const handlePurchase = (item) => {
-    if (purchasedItems[item.id]) {
-      alert(`You have already purchased a ${item.name}!`);
-      return;
-    }
-
-    if (userPoints >= item.price) {
-      setUserPoints(userPoints - item.price);
-      setPurchasedItems(prev => ({ ...prev, [item.id]: true }));
-      alert(`You bought a ${item.name}!`);
-    } else {
-      alert('Not enough points!');
-    }
-  };
-
-  return (
-    <div className={`modal ${showModal ? 'modal-open' : ''}`}>
-      <div className="modal-box">
-        <h2 className="text-lg font-bold">Store</h2>
-        <p>Your Points: {userPoints}</p>
-        <ul>
-          {storeItems.map(item => (
-            <li key={item.id} className="flex justify-between my-2">
-              <span>{item.name}</span>
-              <span>{item.price} Points</span>
-              <button 
-                className="btn btn-primary"
-                onClick={() => handlePurchase(item)}
-                disabled={purchasedItems[item.id]}
-              >
-                {purchasedItems[item.id] ? 'Purchased' : 'Buy'}
-              </button>
-            </li>
-          ))}
-        </ul>
-        <button className="btn btn-outline" onClick={handleClose}>Close</button>
-      </div>
-    </div>
-  );
-}
 
 function App() {
   const [showAddBudgetModal, setShowAddBudgetModal] = useState(false);
@@ -274,6 +241,7 @@ function App() {
         purchasedItems={purchasedItems}
         setPurchasedItems={setPurchasedItems}
       />
+      <Toaster />
     </Router>
   );
 }
