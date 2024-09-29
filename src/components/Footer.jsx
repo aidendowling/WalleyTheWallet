@@ -16,7 +16,7 @@ export default function Footer() {
           </div>
         </div>
       </footer>
-
+    {/* Column */}
       <footer className="flex-grow">
         <div className="bg-[#f4b4c4] py-3 mb-3 p-5">
         <div className="container mx-auto py-3 p=7">
