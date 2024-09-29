@@ -47,7 +47,7 @@ export default function Home() {
           <div className="container mx-auto px-4">
             <div className="flex justify-center items-center space-x-4">
               {walletImages.map((img, index) => (
-                <img key={index} src={img} alt={`Wallet ${index}`} className="h-16 w-auto" />
+                <img key={index} src={img} alt={`Wallet ${index}`} className="h-28 w-auto" />
               ))}
             </div>
           </div>
