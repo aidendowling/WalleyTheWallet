@@ -16,16 +16,18 @@ export default function Footer() {
           </div>
         </div>
       </footer>
-
-      {/* Contact Us section */}
+    {/* Column */}
       <footer className="flex-grow">
-        <div className="bg-white-800 py-3 mb-3 p-5">
+        <div className="bg-[#f4b4c4] py-3 mb-3 p-5">
         <div className="container mx-auto py-3 p=7">
+
         <p className="mb-2"><strong>Contact Us!</strong></p>
         <p> +1 434-530-768 </p>
         <p> <a href="walleymail@hex.com"> walleymail@hex.com </a></p>
+   
             <div className="container mx-auto py-3">
-              <p className="mb-2"><strong>Extra Resources:</strong></p>
+       
+            <p className="mb-2"><strong>Extra Resources:</strong></p>
           <p><a href="https://studentaid.gov/">FAFSA</a></p> 
           <p><a href="https://studentaid.gov/resources/prepare-for-college/students/budgeting/budgeting-tips">Top College Budgeting Tips</a></p> 
           <p><a href="https://www.bankrate.com/investing/passive-income-ideas/">Passive Income Tips & Tricks</a></p> 
@@ -35,6 +37,6 @@ export default function Footer() {
           </div>
         </div>
       </footer>
-    </div>
+      </div>
   );
 }
