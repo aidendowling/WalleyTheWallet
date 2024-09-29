@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
-import { X } from "lucide-react";
+import { X, ChevronDown } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -9,13 +9,29 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { UNCATEGORIZED_BUDGET_ID, useBudgets } from "../contexts/BudgetsContext";
 import { currencyFormatter } from "../../utils";
 
 function ViewExpensesModal({ budgetId, handleClose }) {
   const { getBudgetExpenses, budgets, deleteBudget, deleteExpense } = useBudgets();
   const { toast } = useToast();
-  const expenses = getBudgetExpenses(budgetId);
+  const [expenses, setExpenses] = useState(getBudgetExpenses(budgetId));
   const budget =
     UNCATEGORIZED_BUDGET_ID === budgetId
       ? { name: "Uncategorized", id: UNCATEGORIZED_BUDGET_ID }
@@ -33,6 +49,7 @@ function ViewExpensesModal({ budgetId, handleClose }) {
 
   const handleDeleteExpense = (expense) => {
     deleteExpense(expense);
+    setExpenses(expenses.filter(e => e.id !== expense.id));
     toast({
       title: "Expense Deleted",
       description: `The expense "${expense.description}" has been deleted.`,
@@ -44,46 +61,64 @@ function ViewExpensesModal({ budgetId, handleClose }) {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-      <Card className="w-[90%] max-w-[600px] max-h-[80vh] overflow-y-auto relative">
-        <Button
-          className="absolute top-2 right-2 h-8 w-8 p-0"
-          variant="ghost"
-          onClick={handleClose}
-        >
-          <X className="h-4 w-4" />
-        </Button>
+      <Card className="w-[90%] max-w-[800px] max-h-[80vh] overflow-y-auto">
         <CardHeader className="flex flex-row justify-between items-center">
           <CardTitle>Expenses - {budget?.name}</CardTitle>
-          {budgetId !== UNCATEGORIZED_BUDGET_ID && (
+          <div className="flex space-x-2">
+            {budgetId !== UNCATEGORIZED_BUDGET_ID && (
+              <Button
+                onClick={handleDeleteBudget}
+                variant="destructive"
+                size="sm"
+              >
+                Delete Budget
+              </Button>
+            )}
             <Button
-              onClick={handleDeleteBudget}
-              variant="destructive"
-              size="sm"
+              className="h-8 w-8 p-0"
+              variant="ghost"
+              onClick={handleClose}
             >
-              Delete Budget
+              <X className="h-4 w-4" />
             </Button>
-          )}
+          </div>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            {expenses.map(expense => (
-              <div key={expense.id} className="flex justify-between items-center">
-                <span className="text-lg">{expense.description}</span>
-                <div className="flex items-center space-x-2">
-                  <span className="text-base font-medium">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Description</TableHead>
+                <TableHead className="text-right">Amount</TableHead>
+                <TableHead className="w-[100px]">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {expenses.map(expense => (
+                <TableRow key={expense.id}>
+                  <TableCell>{expense.description}</TableCell>
+                  <TableCell className="text-right">
                     {currencyFormatter.format(expense.amount)}
-                  </span>
-                  <Button
-                    onClick={() => handleDeleteExpense(expense)}
-                    variant="destructive"
-                    size="sm"
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-            ))}
-          </div>
+                  </TableCell>
+                  <TableCell>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="h-8 w-8 p-0">
+                          <span className="sr-only">Open menu</span>
+                          <ChevronDown className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                        <DropdownMenuItem onClick={() => handleDeleteExpense(expense)}>
+                          Delete Expense
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </CardContent>
         <CardFooter className="flex justify-end">
           <Button onClick={handleClose}>Close</Button>

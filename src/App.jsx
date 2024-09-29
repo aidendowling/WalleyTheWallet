@@ -10,14 +10,13 @@ import TotalBudgetCard from "./components/TotalBudgetCard";
 import StudentLoanModal from "./components/StudentLoanModal"; 
 import StudentLoanCard from "./components/StudentLoanCard";
 import StoreModal from './components/StoreModal';
-
 import Home from './components/Home';
-
+import Header from './components/Header';
+import Mascot from './components/Mascot';
+import FinancialChallenges from './components/FinancialChallenges';
 
 import { Button } from "@/components/ui/button";
 import { Toaster } from "@/components/ui/toaster"
-
-
 
 // Import your images
 import emptyImage from './assets/empty.png'; 
@@ -31,11 +30,11 @@ import S40 from './assets/S40.png';
 import S80 from './assets/S80.png';
 import Sfull from './assets/Sfull.png';
 
-
 function App() {
   const [showAddBudgetModal, setShowAddBudgetModal] = useState(false);
   const [showAddExpenseModal, setShowAddExpenseModal] = useState(false);
   const [showStudentLoanModal, setShowStudentLoanModal] = useState(false);
+  const [showStoreModal, setShowStoreModal] = useState(false);
   const [studentLoans, setStudentLoans] = useState([]);
   const [viewExpensesModalBudgetId, setViewExpensesModalBudgetId] = useState();
   const [addExpenseModalBudgetId, setAddExpenseModalBudgetId] = useState();
@@ -44,8 +43,6 @@ function App() {
   const [budgetImage, setBudgetImage] = useState(emptyImage);
   const [fullnessRatio, setFullnessRatio] = useState(0); 
 
-  // Points system and store feature states
-  const [showStoreModal, setShowStoreModal] = useState(false);
   const [purchasedItems, setPurchasedItems] = useState({});
   const [storeItems] = useState([
     { id: 1, name: 'Hat', price: 50 },
@@ -53,17 +50,15 @@ function App() {
     { id: 3, name: 'Backpack', price: 100 },
   ]);
 
-  const [userItems, setUserItems] = useState([]);
-  const [userPoints, setUserPoints] = useState(0); // Starting points at 0
+  const [userPoints, setUserPoints] = useState(0);
 
-  // Challenges state
   const [challenges, setChallenges] = useState([
     { id: 1, description: "Save $50 this week", isCompleted: false },
     { id: 2, description: "Cut out one unnecessary expense", isCompleted: false },
     { id: 3, description: "Spend less than $100 this week", isCompleted: false },
   ]);
 
-  function openAddExpenseModal(budgetId) {
+  const openAddExpenseModal = (budgetId) => {
     setShowAddExpenseModal(true);
     setAddExpenseModalBudgetId(budgetId);
   }
@@ -73,14 +68,15 @@ function App() {
     setShowStudentLoanModal(false);
   };
 
-  // Function to complete a challenge
   const completeChallenge = (challengeId) => {
     setChallenges(prevChallenges => 
       prevChallenges.map(challenge => 
         challenge.id === challengeId ? { ...challenge, isCompleted: true } : challenge
       )
     );
-    setUserPoints(prevPoints => prevPoints + 20); // Reward for completing a challenge
+    setTimeout(() => {
+      setUserPoints(prevPoints => prevPoints + 20);
+    }, 1000); // Delay the point increase by 1 second
   };
 
   useEffect(() => {
@@ -104,33 +100,17 @@ function App() {
     const calculatedFullnessRatio = totalExpenses / totalBudget;
     setFullnessRatio(calculatedFullnessRatio);
   
-    // Determine which image to use based on fullness ratio and purchased items
-    let selectedImage;
-    if (purchasedItems[2]) { // Check if sunglasses are purchased
-      if (calculatedFullnessRatio <= 0.2) {
-        selectedImage = Sempty;
-      } else if (calculatedFullnessRatio <= 0.5) {
-        selectedImage = S20;
-      } else if (calculatedFullnessRatio <= 0.8) {
-        selectedImage = S40;
-      } else if (calculatedFullnessRatio <= 0.99) {
-        selectedImage = S80;
-      } else {
-        selectedImage = Sfull;
-      }
-    } else {
-      if (calculatedFullnessRatio <= 0.2) {
-        selectedImage = emptyImage;
-      } else if (calculatedFullnessRatio <= 0.5) {
-        selectedImage = imageTwenty;
-      } else if (calculatedFullnessRatio <= 0.8) {
-        selectedImage = imageFourty;
-      } else if (calculatedFullnessRatio <= 0.99) {
-        selectedImage = imageEighty;
-      } else {
-        selectedImage = fullImage;
-      }
-    }
+    const selectedImage = purchasedItems[2]
+      ? calculatedFullnessRatio <= 0.2 ? Sempty
+        : calculatedFullnessRatio <= 0.5 ? S20
+        : calculatedFullnessRatio <= 0.8 ? S40
+        : calculatedFullnessRatio <= 0.99 ? S80
+        : Sfull
+      : calculatedFullnessRatio <= 0.2 ? emptyImage
+        : calculatedFullnessRatio <= 0.5 ? imageTwenty
+        : calculatedFullnessRatio <= 0.8 ? imageFourty
+        : calculatedFullnessRatio <= 0.99 ? imageEighty
+        : fullImage;
   
     setBudgetImage(selectedImage);
   }, [budgets, getBudgetExpenses, purchasedItems]);
@@ -141,22 +121,16 @@ function App() {
         <Route path="/home" element={<Home />} />
         <Route path="/app" element={
           <div className="container mx-auto p-4 flex flex-col min-h-screen relative">
-            <h1 className="text-2xl font-bold mb-4">Budgets</h1>
-            <p className="text-lg font-semibold">Points: {userPoints}</p>
+            <Header title="Budgets" points={userPoints} />
+            <Mascot image={budgetImage} />
+            
             <div className="flex flex-wrap items-center mb-4 gap-2">
-              <button className="btn btn-primary" onClick={() => setShowAddBudgetModal(true)}>
-                Add Budget
-              </button>
-              <button className="btn btn-outline btn-primary" onClick={openAddExpenseModal}>
-                Add Expense
-              </button>
-              <button className="btn btn-outline btn-secondary" onClick={() => setShowStudentLoanModal(true)}>
-                Add Student Loan Expense
-              </button>
-              <button className="btn btn-outline btn-success" onClick={() => setShowStoreModal(true)}>
-                Visit Store
-              </button>
+              <Button variant="default" onClick={() => setShowAddBudgetModal(true)}>Add Budget</Button>
+              <Button variant="outline" onClick={openAddExpenseModal}>Add Expense</Button>
+              <Button variant="secondary" onClick={() => setShowStudentLoanModal(true)}>Add Student Loan Expense</Button>
+              <Button variant="ghost" onClick={() => setShowStoreModal(true)}>Visit Store</Button>
             </div>
+            
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-4">
               {budgets.map(budget => {
                 const amount = getBudgetExpenses(budget.id).reduce(
@@ -164,71 +138,33 @@ function App() {
                   0
                 );
                 return (
-                  <div key={budget.id} className="w-full">
-                    <BudgetCard
-                      name={budget.name}
-                      amount={amount}
-                      max={budget.max}
-                      onAddExpenseClick={() => openAddExpenseModal(budget.id)}
-                      onViewExpensesClick={() => setViewExpensesModalBudgetId(budget.id)}
-                    />
-                  </div>
+                  <BudgetCard
+                    key={budget.id}
+                    name={budget.name}
+                    amount={amount}
+                    max={budget.max}
+                    onAddExpenseClick={() => openAddExpenseModal(budget.id)}
+                    onViewExpensesClick={() => setViewExpensesModalBudgetId(budget.id)}
+                  />
                 );
               })}
               {studentLoans.map((loan, index) => (
                 <StudentLoanCard key={index} loan={loan} />
               ))}
-              <div className="w-full">
-                <UncategorizedBudgetCard
-                  onAddExpenseClick={openAddExpenseModal}
-                  onViewExpensesClick={() => setViewExpensesModalBudgetId(UNCATEGORIZED_BUDGET_ID)}
-                />
-              </div>
-              <div className="w-full">
-                <TotalBudgetCard />
-              </div>
-            </div>
-
-            {/* Financial Challenges Section */}
-            <div className="flex flex-col mb-4">
-              <h2 className="text-xl font-bold">Financial Challenges</h2>
-              <div className="grid grid-cols-1 gap-4">
-                {challenges.map(challenge => (
-                  <div key={challenge.id} className="border p-4 rounded-lg">
-                    <p>{challenge.description}</p>
-                    {!challenge.isCompleted ? (
-                      <button 
-                        className="btn btn-success"
-                        onClick={() => completeChallenge(challenge.id)}
-                      >
-                        Complete Challenge
-                      </button>
-                    ) : (
-                      <span className="text-green-600 font-bold">Completed</span>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Image in the Top Right Corner */}
-            <div className="absolute top-4 right-10">
-              <img
-                src={budgetImage}
-                alt="Budget Status"
-                style={{
-                  width: '200px',  // Increased width
-                  height: '200px', // Increased height
-                  objectFit: 'contain',
-                }}
+              <UncategorizedBudgetCard
+                onAddExpenseClick={openAddExpenseModal}
+                onViewExpensesClick={() => setViewExpensesModalBudgetId(UNCATEGORIZED_BUDGET_ID)}
               />
+              <TotalBudgetCard />
             </div>
+
+            <FinancialChallenges challenges={challenges} completeChallenge={completeChallenge} />
           </div>
         } />
         <Route path="/" element={<Navigate to="/home" replace />} />
       </Routes>
       
-      {/* Keep your modals outside of the Routes */}
+      {/* Keep all the modal components */}
       <AddBudgetModal
         showModal={showAddBudgetModal}
         handleClose={() => setShowAddBudgetModal(false)}
