@@ -31,7 +31,7 @@ export default function Home() {
         <div className="bg-[#f4b4c4] py-12">
           <div className="container mx-auto px-4 text-center">
             <h1 className="text-5xl font-bold mb-4">Walley the Wallet</h1>
-            <p className="text-xl mb-6">Your finance companion</p>
+            <p className="text-xl mb-6">Your Finance Companion</p>
             <div className="space-x-4">
               <Button asChild>
                 <Link to="/app">Walley</Link>
