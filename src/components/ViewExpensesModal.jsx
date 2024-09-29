@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { X, ChevronDown } from "lucide-react";
@@ -22,7 +22,6 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { UNCATEGORIZED_BUDGET_ID, useBudgets } from "../contexts/BudgetsContext";
@@ -31,7 +30,14 @@ import { currencyFormatter } from "../../utils";
 function ViewExpensesModal({ budgetId, handleClose }) {
   const { getBudgetExpenses, budgets, deleteBudget, deleteExpense } = useBudgets();
   const { toast } = useToast();
-  const [expenses, setExpenses] = useState(getBudgetExpenses(budgetId));
+  const [expenses, setExpenses] = useState([]);
+  
+  useEffect(() => {
+    if (budgetId != null) {
+      setExpenses(getBudgetExpenses(budgetId));
+    }
+  }, [budgetId, getBudgetExpenses]);
+
   const budget =
     UNCATEGORIZED_BUDGET_ID === budgetId
       ? { name: "Uncategorized", id: UNCATEGORIZED_BUDGET_ID }
@@ -49,7 +55,7 @@ function ViewExpensesModal({ budgetId, handleClose }) {
 
   const handleDeleteExpense = (expense) => {
     deleteExpense(expense);
-    setExpenses(expenses.filter(e => e.id !== expense.id));
+    setExpenses(getBudgetExpenses(budgetId));
     toast({
       title: "Expense Deleted",
       description: `The expense "${expense.description}" has been deleted.`,

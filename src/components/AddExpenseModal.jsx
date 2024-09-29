@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
@@ -27,12 +27,16 @@ function AddExpenseModal({ showModal, handleClose, defaultBudgetId }) {
   const { addExpense, budgets } = useBudgets();
   const { toast } = useToast();
 
+  useEffect(() => {
+    budgetIdRef.current = defaultBudgetId;
+  }, [defaultBudgetId]);
+
   function handleSubmit(e) {
     e.preventDefault();
     addExpense({
       description: descriptionRef.current.value,
       amount: parseFloat(amountRef.current.value),
-      budgetId: budgetIdRef.current,
+      budgetId: budgetIdRef.current || UNCATEGORIZED_BUDGET_ID,
     });
     toast({
       title: "Expense Added",
@@ -83,7 +87,10 @@ function AddExpenseModal({ showModal, handleClose, defaultBudgetId }) {
               </div>
               <div className="flex flex-col space-y-1.5">
                 <Label htmlFor="budget">Budget</Label>
-                <Select defaultValue={defaultBudgetId} onValueChange={(value) => budgetIdRef.current = value}>
+                <Select 
+                  defaultValue={defaultBudgetId} 
+                  onValueChange={(value) => budgetIdRef.current = value}
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Select a budget" />
                   </SelectTrigger>
